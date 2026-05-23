@@ -1,0 +1,7 @@
+{
+  "name": "smartcomp-ai",
+  "private": true,
+  "scripts": {
+    "dev": "next dev"
+  }
+}
