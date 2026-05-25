@@ -1,0 +1,362 @@
+Final SaaS Architecture
+smartcomp-ai-v2/
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── db/
+│   │   ├── models/
+│   │   ├── services/
+│   │   ├── payroll/
+│   │   ├── ai_engine/
+│   │   ├── attendance/
+│   │   ├── reports/
+│   │   └── main.py
+│   │
+│   ├── requirements.txt
+│   ├── railway.json
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   ├── dashboard/
+│   ├── payroll/
+│   ├── employees/
+│   ├── reports/
+│   ├── lib/
+│   ├── styles/
+│   ├── package.json
+│   ├── next.config.js
+│   └── vercel.json
+│
+├── docs/
+├── .env.example
+├── README.md
+└── docker-compose.yml
+Backend Stack
+Core Technologies
+FastAPI
+
+PostgreSQL
+
+SQLAlchemy
+
+JWT Authentication
+
+Pydantic
+
+OpenAI-ready AI layer
+
+Railway Deployment
+
+Frontend Stack
+Core Technologies
+Next.js 15
+
+TailwindCSS
+
+TypeScript
+
+Framer Motion
+
+Recharts
+
+Vercel Deployment
+
+Main SaaS Modules
+1. Authentication System
+Features:
+
+Login
+
+Register
+
+JWT Auth
+
+Protected Routes
+
+Role-based Access
+
+Roles:
+
+Super Admin
+
+HR Manager
+
+Payroll Officer
+
+School Admin
+
+2. Employee Management
+Employee Fields:
+
+{
+  "employee_id": "EMP-1001",
+  "name": "Ahmed Ali",
+  "department": "Science",
+  "position": "Teacher",
+  "education_level": "Bachelor",
+  "years_experience": 5,
+  "joining_date": "2026-01-10",
+  "base_salary": 7000,
+  "allowances": 1200,
+  "deductions": 300
+}
+3. Payroll Engine
+Payroll Cycle
+Automatically:
+
+29 Previous Month → 28 Current Month
+Supports:
+
+Full salary
+
+Partial salary
+
+New employee prorated salary
+
+Overtime
+
+Absence deduction
+
+Late penalties
+
+Bonuses
+
+Taxes
+
+Insurance deductions
+
+New Employee Prorated Logic
+Formula:
+
+Salary = (Worked Days / Payroll Days) × Full Salary
+Example:
+
+Employee joined on 10th
+Worked 19 days
+Payroll days = 30
+
+Salary = 19 / 30 × Salary
+Attendance Validation Engine
+Features
+Attendance upload
+
+Missing days detection
+
+Duplicate attendance alerts
+
+Weekend auto-detection
+
+Official holidays exclusion
+
+Late arrival tracking
+
+Holiday Policy System
+Supports
+Friday/Saturday weekends
+
+Official Egyptian holidays
+
+School-specific holidays
+
+Dynamic yearly updates
+
+AI Risk Engine
+Purpose
+Detect payroll anomalies automatically.
+
+AI Checks
+Unusual salary increase
+
+Duplicate payments
+
+Attendance mismatch
+
+Negative deductions
+
+Outlier compensation
+
+Excess overtime
+
+AI Recommendation Examples
+⚠ Employee salary increased by 48%
+Recommendation: HR approval required.
+⚠ Attendance mismatch detected.
+Recommendation: Recalculate payroll.
+Reporting System
+Reports
+Employee Payroll Report
+
+Department Summary
+
+Payroll Analytics
+
+Salary Trend Analysis
+
+Attendance Risk Report
+
+AI Recommendations Report
+
+Export Formats:
+
+PDF
+
+Excel
+
+CSV
+
+Database Design
+Main Tables
+users
+employees
+attendance
+payroll_cycles
+payroll_records
+departments
+holidays
+risk_alerts
+audit_logs
+Example Employee Table
+CREATE TABLE employees (
+    id SERIAL PRIMARY KEY,
+    employee_id VARCHAR(50),
+    name VARCHAR(255),
+    department VARCHAR(255),
+    position VARCHAR(255),
+    base_salary FLOAT,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+FastAPI Main Entry
+main.py
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI(title="SmartComp AI")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def home():
+    return {
+        "status": "running",
+        "app": "SmartComp AI"
+    }
+Payroll Calculation Service
+def calculate_salary(base_salary, worked_days, payroll_days):
+    return (worked_days / payroll_days) * base_salary
+AI Risk Engine Example
+def detect_salary_risk(old_salary, new_salary):
+    increase = ((new_salary - old_salary) / old_salary) * 100
+
+    if increase > 30:
+        return {
+            "risk": True,
+            "message": "Abnormal salary increase detected"
+        }
+
+    return {
+        "risk": False
+    }
+Frontend Dashboard Layout
+Main Sections
+Dashboard
+Employees
+Payroll
+Attendance
+AI Alerts
+Reports
+Settings
+SaaS Dashboard Widgets
+KPI Cards
+Total Employees
+
+Total Payroll
+
+Payroll Risks
+
+Attendance Rate
+
+Department Costs
+
+Startup UI Direction
+Visual Identity
+Style:
+
+Dark Navy Background
+
+Neon Purple Accent
+
+Cyan Highlights
+
+Glassmorphism Cards
+
+SaaS Analytics Design
+
+Recommended UI Libraries
+shadcn/ui
+lucide-react
+framer-motion
+recharts
+Railway Deployment
+railway.json
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE"
+  },
+  "deploy": {
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
+Dockerfile
+FROM python:3.11
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+Frontend Deployment
+vercel.json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ]
+}
+Environment Variables
+Backend
+DATABASE_URL=
+JWT_SECRET=
+OPENAI_API_KEY=
+Frontend
+NEXT_PUBLIC_API_URL=
+API Endpoints
+Authentication
+POST /auth/login
+POST /auth/register
+Employees
+GET /employees
+POST /employees
+PUT /employees/{id}
+DELETE /employees/{id}
+Payroll
+POST /payroll/calculate
+GET /payroll/reports
+AI Risks
+GET /ai/alerts
