@@ -1,0 +1,15 @@
+return alerts
+Frontend Generation Phase
+Frontend Folder Structure
+frontend/
+├── app/
+├── components/
+├── dashboard/
+├── employees/
+├── payroll/
+├── reports/
+├── lib/
+├── hooks/
+├── services/
+├── styles/
+└── public/
