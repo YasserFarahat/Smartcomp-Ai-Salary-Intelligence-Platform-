@@ -1,0 +1,133 @@
+backend/
+├── app/
+│   ├── api/
+│   │   ├── auth.py
+│   │   ├── employees.py
+│   │   ├── payroll.py
+│   │   ├── attendance.py
+│   │   └── ai_alerts.py
+│   │
+│   ├── core/
+│   │   ├── config.py
+│   │   ├── security.py
+│   │   └── database.py
+│   │
+│   ├── models/
+│   │   ├── employee.py
+│   │   ├── payroll.py
+│   │   ├── attendance.py
+│   │   └── user.py
+│   │
+│   ├── services/
+│   │   ├── payroll_service.py
+│   │   ├── attendance_service.py
+│   │   └── report_service.py
+│   │
+│   ├── ai_engine/
+│   │   └── risk_detector.py
+│   │
+│   ├── schemas/
+│   └── main.py
+│
+├── requirements.txt
+├── Dockerfile
+└── railway.json
+Backend Requirements
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+python-jose
+passlib
+bcrypt
+python-multipart
+pydantic
+pandas
+openpyxl
+reportlab
+Database Configuration
+database.py
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import os
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
+Base = declarative_base()
+JWT Security Layer
+security.py
+from datetime import datetime, timedelta
+from jose import jwt
+
+SECRET_KEY = "SMARTCOMP_SECRET"
+ALGORITHM = "HS256"
+
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(hours=12)
+    to_encode.update({"exp": expire})
+
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+Employee Model
+employee.py
+from sqlalchemy import Column, Integer, String, Float
+from app.core.database import Base
+
+
+class Employee(Base):
+    __tablename__ = "employees"
+
+    id = Column(Integer, primary_key=True)
+    employee_id = Column(String)
+    name = Column(String)
+    department = Column(String)
+    position = Column(String)
+    base_salary = Column(Float)
+Payroll Service
+payroll_service.py
+from datetime import datetime
+
+
+def calculate_prorated_salary(base_salary, worked_days, payroll_days):
+    return round((worked_days / payroll_days) * base_salary, 2)
+
+
+def calculate_deductions(absent_days, deduction_per_day):
+    return absent_days * deduction_per_day
+
+
+def calculate_net_salary(base_salary, bonuses, deductions):
+    return base_salary + bonuses - deductions
+Attendance Upload Flow
+Workflow
+Upload Excel File
+→ Validate Data
+→ Detect Missing Employees
+→ Detect Duplicate Records
+→ Save Clean Data
+→ Generate Attendance Summary
+AI Risk Detection Module
+risk_detector.py
+
+def detect_payroll_anomalies(employee_data):
+    alerts = []
+
+    if employee_data["overtime_hours"] > 80:
+        alerts.append("Excess overtime detected")
+
+    if employee_data["salary_increase_percent"] > 30:
+        alerts.append("Abnormal salary increase")
+
+    if employee_data["deductions"] < 0:
+        alerts.append("Negative deductions error")
+
+    return alerts
