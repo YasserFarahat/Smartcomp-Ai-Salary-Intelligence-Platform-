@@ -16,7 +16,12 @@ frontend/
 {
   "name": "smartcomp-ai-frontend",
   "private": true,
-  "scripts": {
+  "scripts": {/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+}
+
+module.exports = nextConfig
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
